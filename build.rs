@@ -1624,6 +1624,14 @@ fn main() {
     config.define("LLAMA_BUILD_EXAMPLES", "OFF");
     config.define("LLAMA_BUILD_SERVER", "OFF");
 
+    // Queriton patch: build llama.cpp's common HTTP client (cpp-httplib) without
+    // OpenSSL. Consumers that download models themselves never use it, and
+    // linking it drags a second, externally-installed TLS stack into the
+    // shipped binary. Without OpenSSL an https:// request through common/http.h
+    // fails with an explicit "HTTPS is not supported" error — it never downgrades.
+    // Upstream equivalent: eugenehp/llama-cpp-rs#340 (LLAMA_OPENSSL env var).
+    config.define("LLAMA_OPENSSL", "OFF");
+
     // Disable expensive CMake tests and checks for faster builds
     config.define("CMAKE_SKIP_INSTALL_RPATH", "ON");
     config.define("CMAKE_SKIP_RPATH", "ON");
